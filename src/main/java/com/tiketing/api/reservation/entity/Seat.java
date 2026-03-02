@@ -1,6 +1,7 @@
 package com.tiketing.api.reservation.entity;
 
 import com.tiketing.api.concert.entity.ConcertSchedule;
+import com.tiketing.api.global.entity.BaseEntity;
 import com.tiketing.api.reservation.enums.SeatStatus;
 
 import jakarta.persistence.Column;
@@ -22,17 +23,20 @@ import lombok.NoArgsConstructor;
 @Table(name = "seat")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Seat {
+public class Seat extends BaseEntity {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "seat_id")
 	private Long seatId;
 	
-	@Column(name = "seat_rating")
+	@Column(name = "seat_rating", nullable = false)
 	private String seatRating;
 	
-	@Column(name = "seat_price")
+	@Column(name = "seat_name", nullable = false)
+	private String seatName;
+	
+	@Column(name = "seat_price", nullable = false)
 	private Long seatPrice;
 	
 	@Enumerated(EnumType.STRING)

@@ -1,4 +1,4 @@
-package com.tiketing.api.concert.entity;
+package com.tiketing.api.reservation.entity;
 
 import com.tiketing.api.global.entity.BaseEntity;
 
@@ -16,30 +16,34 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "concert_price")
+@Table(name = "reservation_item")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class ConcertPrice extends BaseEntity {
+public class ReservationItem extends BaseEntity {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "concert_price_id")
-	private Long concertPriceId;
+	@Column(name = "reservation_item_id")
+	private Long reservationItemId;
+	
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "reservation_id", nullable = false)
+	private Reservation reservation;
+	
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "seat_id", nullable = false)
+	private Seat seat;
 	
 	@Column(name = "seat_rating", nullable = false)
 	private String seatRating;
 	
+	@Column(name = "seat_name", nullable = false)
+	private String seatName;
+	
 	@Column(name = "seat_price", nullable = false)
 	private Long seatPrice;
 	
-	@Column(name = "seat_count", nullable = false)
-	private Integer seatCount;
-	
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "concert_id")
-	private Concert concert;
-	
-	public void setConcert(Concert concert) {
-		this.concert = concert;
+	public void setReservation(Reservation reservation) {
+		this.reservation = reservation;
 	}
 }

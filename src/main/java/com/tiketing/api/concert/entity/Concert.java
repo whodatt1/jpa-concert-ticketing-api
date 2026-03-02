@@ -9,6 +9,7 @@ import org.hibernate.annotations.SQLRestriction;
 import org.springframework.data.annotation.CreatedDate;
 
 import com.tiketing.api.concert.enums.ConcertRating;
+import com.tiketing.api.global.entity.BaseEntity;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -30,7 +31,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 // JPA delete 호출 시 del_yn를 Y처리하여 Soft Delete 자동화
 @SQLDelete(sql = "UPDATE concert SET del_yn = 'Y' WHERE concert_id = ?")
-public class Concert {
+public class Concert extends BaseEntity {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -55,10 +56,6 @@ public class Concert {
 	
 	@Column(name = "ended_at", nullable = false)
 	private LocalDateTime endedAt;
-	
-	@Column(name = "created_at", nullable = false)
-	@CreatedDate
-	private LocalDateTime createdAt;
 	
 	// mappedBy => 상대방 엔티티에 선언된 객체 변수명을 가리킨다. 해당 컬럼을 통해 조인
 	// 명시가 없을 경우 JPA가 임의로 매핑테이블을 새로 생성

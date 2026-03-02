@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.tiketing.api.concert.enums.ScheduleStatus;
+import com.tiketing.api.global.entity.BaseEntity;
 import com.tiketing.api.reservation.entity.Seat;
 
 import jakarta.persistence.CascadeType;
@@ -29,7 +30,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "concert_schedule")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class ConcertSchedule {
+public class ConcertSchedule extends BaseEntity {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -50,7 +51,7 @@ public class ConcertSchedule {
 	@Column(name = "schedule_status", nullable = false)
 	private ScheduleStatus status = ScheduleStatus.OPEN;
 	
-	@OneToMany(mappedBy = "concert_schedule", cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "concertSchedule", cascade = CascadeType.ALL)
 	private List<Seat> seats = new ArrayList<>();
 	
 	public void setConcert(Concert concert) {

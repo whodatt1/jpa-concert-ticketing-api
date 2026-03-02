@@ -1,5 +1,7 @@
 package com.tiketing.api.concert.entity;
 
+import com.tiketing.api.global.entity.BaseEntity;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -17,7 +19,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "concert_category")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class ConcertCategory {
+public class ConcertCategory extends BaseEntity {
 	
 	@Id 
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
