@@ -9,10 +9,12 @@ import org.hibernate.annotations.SQLRestriction;
 import org.springframework.data.annotation.CreatedDate;
 
 import com.tiketing.api.concert.enums.ConcertRating;
+import com.tiketing.api.global.entity.Address;
 import com.tiketing.api.global.entity.BaseEntity;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -22,6 +24,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -44,12 +47,19 @@ public class Concert extends BaseEntity {
 	@Column(name = "concert_description")
 	private String concertDescription;
 	
+	@Embedded
+	private Address address;
+	
 	@Enumerated(EnumType.STRING)
 	@Column(name = "rating", nullable = false)
 	private ConcertRating rating;
 	
 	@Column(name = "del_yn", nullable = false)
 	private String delYn = "N"; // 기본 값을 N으로 설정
+	
+	// 추가: 전시 여부 (기본값 N) => 순차적 생성을 위한 관리 값
+    @Column(name = "show_yn", nullable = false)
+    private String showYn = "N";
 	
 	@Column(name = "started_at", nullable = false)
 	private LocalDateTime startedAt;
