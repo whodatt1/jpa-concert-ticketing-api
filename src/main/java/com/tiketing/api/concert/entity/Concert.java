@@ -92,4 +92,15 @@ public class Concert extends BaseEntity {
 		this.schedules.add(concertSchedule);
 		concertSchedule.setConcert(this);
 	}
+	
+	@Builder
+	public Concert(String concertName, String concertDescription, Address address, ConcertRating rating,
+			LocalDateTime startedAt, LocalDateTime endedAt) {
+		this.concertName = concertName;
+		this.concertDescription = concertDescription;
+		this.address = address;
+		this.rating = rating;
+		this.startedAt = startedAt;
+		this.endedAt = endedAt;
+	}
 }

@@ -12,6 +12,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -35,5 +36,10 @@ public class Category extends BaseEntity {
 	public void addConcertCategory(ConcertCategory concertCategory) {
 		this.concertCategories.add(concertCategory);
 		concertCategory.setCategory(this);
+	}
+	
+	@Builder
+	public Category(String categoryName) {
+		this.categoryName = categoryName;
 	}
 }
