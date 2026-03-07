@@ -12,6 +12,7 @@ import org.springframework.data.domain.SliceImpl;
 import org.springframework.util.StringUtils;
 
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.tiketing.api.concert.dto.ConcertRequest.SearchCondition;
 import com.tiketing.api.concert.entity.Concert;
@@ -30,8 +31,7 @@ public class ConcertRepositoryImpl implements ConcertRepositoryCustom {
 		// Querydsl을 이용한 콘서트 리스트 조회
 		List<Concert> contents = queryFactory
 				.selectFrom(concert)
-				// 콘서트 객체가 가진 카테고리 리스트를 펼쳐서 조인하고, 이름표(Alias)를 concertCategory로 달아두겠다는 선언
-				.leftJoin(concert.concertCategories, concertCategory)
+				// 컬렉션(1:N) 페이징 불가 이슈로 join() 제거 
 				.where(
 						concertNameContains(condition.concertName()),
 						categoryIdsIn(condition.categoryIds()),
@@ -64,10 +64,22 @@ public class ConcertRepositoryImpl implements ConcertRepositoryCustom {
 	private BooleanExpression concertNameContains(String concertName) {
 		return StringUtils.hasText(concertName) ? concert.concertName.contains(concertName) : null;
 	}
-	
+
+	// JOIN 대신 EXISTS 서브쿼리 도입!
 	private BooleanExpression categoryIdsIn(List<Long> categoryIds) {
-		return (categoryIds != null && !categoryIds.isEmpty()) ?
-					concertCategory.category.categoryId.in(categoryIds) : null;
+		if (categoryIds == null || categoryIds.isEmpty()) {
+			return null;
+		}
+		
+		// "현재 메인 쿼리에서 검사 중인 콘서트와 매핑되어 있고, 요청받은 카테고리 ID를 가진 ConcertCategory가 1개라도 존재하는가?"
+		return JPAExpressions
+						.selectOne()
+						.from(concertCategory)
+						.where(
+								concertCategory.concert.eq(concert), // 메인 쿼리의 concert와 연결
+								concertCategory.category.categoryId.in(categoryIds)
+						)
+						.exists();
 	}
 	
 	private BooleanExpression regionsIn(List<String> regions) {

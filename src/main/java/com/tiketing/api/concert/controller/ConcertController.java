@@ -13,8 +13,11 @@ import com.tiketing.api.concert.dto.ConcertRequest;
 import com.tiketing.api.concert.dto.ConcertResponse;
 import com.tiketing.api.concert.service.ConcertService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
+@Tag(name = "Concert API", description = "콘서트 조회 및 관리 API") // 컨트롤러 이름표
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/concerts")
@@ -22,6 +25,7 @@ public class ConcertController {
 	
 	private final ConcertService concertService;
 	
+	@Operation(summary = "콘서트 목록 조회", description = "다양한 조건(지역, 이름, 마감일 등)으로 콘서트 목록을 조회합니다.") // API 설명
 	@GetMapping
 	public ResponseEntity<Slice<ConcertResponse.Summary>> getConcerts(
 				@ModelAttribute ConcertRequest.SearchCondition searchCondition,

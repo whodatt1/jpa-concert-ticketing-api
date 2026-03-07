@@ -5,8 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.SQLRestriction;
-import org.springframework.data.annotation.CreatedDate;
 
 import com.tiketing.api.concert.enums.ConcertRating;
 import com.tiketing.api.global.entity.Address;
@@ -21,6 +19,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
@@ -29,7 +28,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "concert")
+@Table(
+		name = "concert",
+		indexes = {
+  					@Index(name = "idx_concert_search_all", columnList = "show_yn, del_yn, created_at")
+			}
+		)
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 // JPA delete 호출 시 del_yn를 Y처리하여 Soft Delete 자동화
