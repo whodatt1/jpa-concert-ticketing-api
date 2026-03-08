@@ -12,7 +12,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class Address {
 	private String city; // 서울, 인천, 경기
-	private String venueName; // 공연장 명
 	private String streetAddress; // 전체 도로명 주소
 	private String zipcode;
 }

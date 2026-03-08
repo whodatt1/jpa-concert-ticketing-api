@@ -1,15 +1,11 @@
 package com.tiketing.api.concert.entity;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.tiketing.api.global.entity.BaseEntity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -29,14 +25,6 @@ public class Category extends BaseEntity {
 	
 	@Column(name = "category_name")
 	private String categoryName;
-	
-	@OneToMany(mappedBy = "category")
-	private List<ConcertCategory> concertCategories = new ArrayList<>();
-	
-	public void addConcertCategory(ConcertCategory concertCategory) {
-		this.concertCategories.add(concertCategory);
-		concertCategory.setCategory(this);
-	}
 	
 	@Builder
 	public Category(String categoryName) {

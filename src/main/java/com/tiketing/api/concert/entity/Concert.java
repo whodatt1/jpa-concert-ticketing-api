@@ -12,14 +12,16 @@ import com.tiketing.api.global.entity.BaseEntity;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
-import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Index;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
@@ -51,8 +53,9 @@ public class Concert extends BaseEntity {
 	@Column(name = "concert_description")
 	private String concertDescription;
 	
-	@Embedded
-	private Address address;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "venue_id", nullable = false)
+	private Venue venue;
 	
 	@Enumerated(EnumType.STRING)
 	@Column(name = "rating", nullable = false)
@@ -60,10 +63,6 @@ public class Concert extends BaseEntity {
 	
 	@Column(name = "del_yn", nullable = false)
 	private String delYn = "N"; // 기본 값을 N으로 설정
-	
-	// 추가: 전시 여부 (기본값 N) => 순차적 생성을 위한 관리 값
-    @Column(name = "show_yn", nullable = false)
-    private String showYn = "N";
 	
 	@Column(name = "started_at", nullable = false)
 	private LocalDateTime startedAt;
@@ -98,11 +97,11 @@ public class Concert extends BaseEntity {
 	}
 	
 	@Builder
-	public Concert(String concertName, String concertDescription, Address address, ConcertRating rating,
+	public Concert(String concertName, String concertDescription, Venue venue, ConcertRating rating,
 			LocalDateTime startedAt, LocalDateTime endedAt) {
 		this.concertName = concertName;
 		this.concertDescription = concertDescription;
-		this.address = address;
+		this.venue = venue;
 		this.rating = rating;
 		this.startedAt = startedAt;
 		this.endedAt = endedAt;

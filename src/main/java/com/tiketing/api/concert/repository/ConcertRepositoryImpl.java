@@ -2,6 +2,7 @@ package com.tiketing.api.concert.repository;
 
 import static com.tiketing.api.concert.entity.QConcert.concert;
 import static com.tiketing.api.concert.entity.QConcertCategory.concertCategory;
+import static com.tiketing.api.concert.entity.QVenue.venue;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -31,14 +32,14 @@ public class ConcertRepositoryImpl implements ConcertRepositoryCustom {
 		// Querydsl을 이용한 콘서트 리스트 조회
 		List<Concert> contents = queryFactory
 				.selectFrom(concert)
-				// 컬렉션(1:N) 페이징 불가 이슈로 join() 제거 
+				// N:1 관계이므로 데이터 뻥튀기가 발생하지 않는 안전한 JOIN
+				.join(concert.venue, venue)
 				.where(
 						concertNameContains(condition.concertName()),
 						categoryIdsIn(condition.categoryIds()),
 						regionsIn(condition.regions()),
 						daysLeftLoe(condition.daysLeft()),
 						ratingEq(condition.rating()),
-						concert.showYn.eq("Y"),
 						concert.delYn.eq("N")
 				)
 				.orderBy(concert.createdAt.desc()) // 최신순 정렬
@@ -85,7 +86,7 @@ public class ConcertRepositoryImpl implements ConcertRepositoryCustom {
 	private BooleanExpression regionsIn(List<String> regions) {
 		// Address 객체 안의 city 필드로 검색
 		return (regions != null && !regions.isEmpty()) ?
-					concert.address.city.in(regions) : null;
+					venue.address.city.in(regions) : null;
 	}
 	
 	private BooleanExpression daysLeftLoe(Integer dayLeft) {

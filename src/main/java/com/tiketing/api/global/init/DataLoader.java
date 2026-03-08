@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.tiketing.api.concert.entity.Category;
 import com.tiketing.api.concert.entity.Concert;
 import com.tiketing.api.concert.entity.ConcertCategory;
+import com.tiketing.api.concert.entity.Venue;
 import com.tiketing.api.concert.enums.ConcertRating;
 import com.tiketing.api.concert.repository.ConcertRepository;
 import com.tiketing.api.global.entity.Address;
@@ -35,6 +36,17 @@ public class DataLoader implements CommandLineRunner {
 		System.out.println("데이터 초기화: 카테고리 및 콘서트 데이터 생성 중...");
 		
 		// ==========================================
+		// 1. 공연장(Venue) 마스터 데이터 3개 생성
+		// ==========================================
+		Venue seoulVenue = Venue.builder().venueName("서울 올림픽 체조경기장").capacity(15000).address(new Address("서울", "올림픽로 424", "05540")).build();
+		Venue gyeonggiVenue = Venue.builder().venueName("일산 킨텍스").capacity(20000).address(new Address("경기", "킨텍스로 217-60", "10390")).build();
+		Venue busanVenue = Venue.builder().venueName("부산 벡스코").capacity(10000).address(new Address("부산", "APEC로 55", "48060")).build();
+		
+		em.persist(seoulVenue);
+		em.persist(gyeonggiVenue);
+		em.persist(busanVenue);
+		
+		// ==========================================
         // 1. 카테고리(Category) 더미 데이터 생성
         // ==========================================
 		
@@ -54,16 +66,16 @@ public class DataLoader implements CommandLineRunner {
         // 2. 콘서트(Concert) 더미 데이터 30개 생성
         // ==========================================
 		for (int i = 1; i <= 30; i++) {
-			// 데이터 분산
-			String city = (i % 3 == 0) ? "부산" : (i % 2 == 0) ? "경기" : "서울";
+			// 순서대로 서울, 경기, 부산 공연장 매핑
+			Venue targetVenue = (i % 3 == 0) ? busanVenue : (i % 2 == 0) ? gyeonggiVenue : seoulVenue;
+			String city = targetVenue.getAddress().getCity();
+			
 			LocalDateTime startedAt = LocalDateTime.now().plusDays(i - 10);
 			LocalDateTime endedAt = startedAt.plusDays(2);
 			
-			Address address = new Address(city, "경기장 " + i, "상세주소", "12345");
-			
 			Concert concert = Concert.builder()
 					.concertName("콘서트 - " + city + i)
-					.address(address)
+					.venue(targetVenue)
 					.rating((i % 3 == 0) ? ConcertRating.ALL : (i % 2 == 0) ? ConcertRating.AGE_12 : ConcertRating.AGE_15)
 					.startedAt(startedAt)
 					.endedAt(endedAt)
