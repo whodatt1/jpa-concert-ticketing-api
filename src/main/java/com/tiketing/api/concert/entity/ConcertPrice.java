@@ -12,6 +12,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -39,7 +40,15 @@ public class ConcertPrice extends BaseEntity {
 	@JoinColumn(name = "concert_id")
 	private Concert concert;
 	
+	@Builder
+	public ConcertPrice(String seatRating, Long seatPrice, Integer seatCount) {
+		this.seatRating = seatRating;
+		this.seatPrice = seatPrice;
+		this.seatCount = seatCount;
+	}
+	
 	public void setConcert(Concert concert) {
 		this.concert = concert;
 	}
+
 }

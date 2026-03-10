@@ -23,6 +23,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -51,15 +52,17 @@ public class ConcertSchedule extends BaseEntity {
 	@Column(name = "schedule_status", nullable = false)
 	private ScheduleStatus status = ScheduleStatus.OPEN;
 	
-	@OneToMany(mappedBy = "concertSchedule", cascade = CascadeType.ALL)
+	// JdbcTemplate으로 생성하기 위해 CascadeType.ALL 옵션 제거
+	@OneToMany(mappedBy = "concertSchedule")
 	private List<Seat> seats = new ArrayList<>();
+	
+	@Builder
+	public ConcertSchedule(LocalDate scheduleDate, LocalTime scheduleTime) {
+		this.scheduleDate = scheduleDate;
+		this.scheduleTime = scheduleTime;
+	}
 	
 	public void setConcert(Concert concert) {
 		this.concert = concert;
-	}
-	
-	public void addSeat(Seat seat) {
-		this.seats.add(seat);
-		seat.setConcertSchedule(this);
 	}
 }

@@ -46,8 +46,4 @@ public class Seat extends BaseEntity {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "concert_schedule_id", nullable = false)
 	private ConcertSchedule concertSchedule;
-	
-	public void setConcertSchedule(ConcertSchedule concertSchedule) {
-		this.concertSchedule = concertSchedule;
-	}
 }
