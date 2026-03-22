@@ -7,6 +7,7 @@ import java.util.List;
 
 import com.tiketing.api.concert.enums.ConcertRating;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -16,6 +17,7 @@ import jakarta.validation.constraints.NotNull;
 public class ConcertRequest {
 	
 	// 콘서트 목록 조회 조건
+	@Schema(name = "ConcertSearchCondition")
 	public record SearchCondition(
 		String concertName,
 		List<Long> categoryIds,
@@ -62,6 +64,7 @@ public class ConcertRequest {
 					LocalDate scheduleDate,
 					
 					@NotNull(message = "공연 시간은 필수입니다.")
+					@Schema(type = "string", example = "19:00:00", description = "공연 시간 (HH:mm:ss)")
 					LocalTime scheduleTime
 	) {}
 	

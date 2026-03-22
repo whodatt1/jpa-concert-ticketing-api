@@ -5,6 +5,8 @@ import java.util.List;
 
 import com.tiketing.api.concert.entity.Concert;
 import com.tiketing.api.concert.enums.ConcertRating;
+import com.tiketing.api.reservation.entity.Seat;
+import com.tiketing.api.reservation.enums.SeatStatus;
 
 public class ConcertResponse {
 	

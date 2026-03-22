@@ -33,6 +33,7 @@ public class ConcertService {
 	private final VenueRepository venueRepository;
 	private final SeatJdbcRepository seatJdbcRepository;
 	
+	// 콘서트 생성
 	@Transactional
 	public Long createConcert(ConcertRequest.Create request) {
 		
