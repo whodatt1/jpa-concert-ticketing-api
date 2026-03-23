@@ -3,6 +3,8 @@ package com.tiketing.api.concert.repository;
 import static com.tiketing.api.concert.entity.QConcert.concert;
 import static com.tiketing.api.concert.entity.QConcertCategory.concertCategory;
 import static com.tiketing.api.concert.entity.QVenue.venue;
+import static com.tiketing.api.concert.entity.QConcertSchedule.concertSchedule;
+import static com.tiketing.api.concert.entity.QConcertPrice.concertPrice;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -25,6 +27,24 @@ import lombok.RequiredArgsConstructor;
 public class ConcertRepositoryImpl implements ConcertRepositoryCustom {
 	
 	private final JPAQueryFactory queryFactory;
+	
+	@Override
+	public boolean existsOverlappingConcert(Long venueId, LocalDateTime startedAt, LocalDateTime endedAt) {
+		
+		Integer fetchOne = queryFactory
+				.selectOne()
+				.from(concert)
+				.where(
+						concert.venue.venueId.eq(venueId),
+						concert.delYn.eq("N"),
+						
+						concert.startedAt.loe(endedAt),
+						concert.endedAt.goe(startedAt)
+				)
+				.fetchFirst();
+		
+		return fetchOne != null;
+	}
 
 	@Override
 	public Slice<Concert> searchConcerts(SearchCondition condition, Pageable pageable) {
@@ -57,9 +77,32 @@ public class ConcertRepositoryImpl implements ConcertRepositoryCustom {
 		return new SliceImpl<>(contents, pageable, hasNext);
 	}
 	
+	@Override
+	public Concert getConcert(Long concertId) {
+		
+		Concert content = queryFactory
+				.selectFrom(concert)
+				.leftJoin(concert.schedules, concertSchedule).fetchJoin()
+				// 가격의 경우 batch size에게 맡기기
+				.where(
+						concertIdEq(concertId)
+				)
+				.fetchOne();
+		
+		return content;
+	}
+	
 	// =======================================================
 	// 동적 쿼리를 위한 BooleanExpression 메서드 모음
-	// =======================================================
+	// ======================================================
+
+	private BooleanExpression concertIdEq(Long concertId) {
+		if (concertId == null || concertId <= 0) {
+			return null;
+		}
+		
+		return concert.concertId.eq(concertId);
+	}
 	
 	// Null일 경우 where 조건절에서 빠지게 된다. SQL WHERE 절의 조건식 조각(블록)을 의미하는 전용 객체
 	private BooleanExpression concertNameContains(String concertName) {

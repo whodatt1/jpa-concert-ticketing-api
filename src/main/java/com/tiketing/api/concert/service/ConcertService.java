@@ -1,5 +1,6 @@
 package com.tiketing.api.concert.service;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,6 +51,10 @@ public class ConcertService {
 		if (venue.getCapacity() != null && totalRequestedSeats > venue.getCapacity()) {
 			throw new IllegalArgumentException("총 좌석 수(" + totalRequestedSeats + ")가 공연장 수용 인원(" + venue.getCapacity() + ")을 초과합니다.");
 		}
+		
+		if (concertRepository.existsOverlappingConcert(venue.getVenueId(), request.startedAt(), request.endedAt())) {
+	        throw new IllegalArgumentException("해당 공연장의 대관 기간(" + request.startedAt().toLocalDate() + " ~ " + request.endedAt().toLocalDate() + ")에 이미 겹치는 콘서트 일정이 존재합니다.");
+	    }
 		
 		Concert concert = Concert.builder()
 				.concertName(request.concertName())
@@ -122,8 +127,15 @@ public class ConcertService {
 	}
 	
 	// 콘서트 목록 조회 (전체 리스트)
-	public Slice<ConcertResponse.Summary> getConcerts(ConcertRequest.SearchCondition searchCondition, Pageable pageable) {
+	public Slice<ConcertResponse.Summary> searchConcerts(ConcertRequest.SearchCondition searchCondition, Pageable pageable) {
 		return concertRepository.searchConcerts(searchCondition, pageable)
 				.map(ConcertResponse.Summary::new);
+	}
+	
+	public ConcertResponse.Detail getConcert(Long concertId) {
+		Concert concert = concertRepository.findById(concertId)
+				.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 콘서트입니다."));
+		
+		return ConcertResponse.Detail.from(concert);
 	}
 }

@@ -36,15 +36,6 @@ public class ConcertController {
 	private final ConcertService concertService;
 	private final SeatService seatService;
 	
-	@Operation(summary = "콘서트 목록 조회", description = "다양한 조건(지역, 이름, 마감일 등)으로 콘서트 목록을 조회합니다.") // API 설명
-	@GetMapping
-	public ResponseEntity<Slice<ConcertResponse.Summary>> getConcerts(
-				@ModelAttribute ConcertRequest.SearchCondition searchCondition,
-				@PageableDefault(size = 10) Pageable pageable
-			) {
-		return ResponseEntity.ok(concertService.getConcerts(searchCondition, pageable));
-	}
-	
 	@Operation(summary = "콘서트 생성", description = "새로운 콘서트와 관련 카테고리, 스케줄, 가격, 그리고 수만 개의 좌석 정보를 한 번에 생성합니다.")
 	@PostMapping
 	public ResponseEntity<Long> createConcert(@Valid @RequestBody ConcertRequest.Create request) {
@@ -54,6 +45,24 @@ public class ConcertController {
 		
 		return ResponseEntity.status(HttpStatus.CREATED).body(concertId);
 	}
+	
+	@Operation(summary = "콘서트 목록 조회", description = "다양한 조건(지역, 이름, 마감일 등)으로 콘서트 목록을 조회합니다.") // API 설명
+	@GetMapping
+	public ResponseEntity<Slice<ConcertResponse.Summary>> searchConcerts(
+				@ModelAttribute ConcertRequest.SearchCondition searchCondition,
+				@PageableDefault(size = 10) Pageable pageable
+			) {
+		return ResponseEntity.ok(concertService.searchConcerts(searchCondition, pageable));
+	}
+	
+	@Operation(summary = "콘서트 디테일 조회", description = "콘서트 상세 정보를 조회합니다.")
+	@GetMapping("/{id}")
+	public ResponseEntity<ConcertResponse.Detail> getConcert(
+				@PathVariable("id") Long concertId
+			) {
+		return ResponseEntity.ok(concertService.getConcert(concertId));
+	}
+	
 	
 	@Operation(summary = "좌석 맵 조회", description = "특정 콘서트의 특정 스케쥴 좌석 맵을 조회합니다.")
 	@GetMapping("/{id}/schedules/{scheduleId}/seats")
