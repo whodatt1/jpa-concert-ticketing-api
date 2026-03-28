@@ -20,7 +20,7 @@ import com.tiketing.api.concert.dto.ConcertResponse;
 import com.tiketing.api.concert.dto.SeatRequest;
 import com.tiketing.api.concert.dto.SeatResponse;
 import com.tiketing.api.concert.service.ConcertService;
-import com.tiketing.api.concert.service.SeatService;
+import com.tiketing.api.reservation.service.SeatService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -51,7 +51,7 @@ public class ConcertController {
 	public ResponseEntity<Slice<ConcertResponse.Summary>> searchConcerts(
 				@ModelAttribute ConcertRequest.SearchCondition searchCondition,
 				@PageableDefault(size = 10) Pageable pageable
-			) {
+	) {
 		return ResponseEntity.ok(concertService.searchConcerts(searchCondition, pageable));
 	}
 	
@@ -59,7 +59,7 @@ public class ConcertController {
 	@GetMapping("/{id}")
 	public ResponseEntity<ConcertResponse.Detail> getConcert(
 				@PathVariable("id") Long concertId
-			) {
+	) {
 		return ResponseEntity.ok(concertService.getConcert(concertId));
 	}
 	
@@ -70,7 +70,7 @@ public class ConcertController {
 				@PathVariable("id") Long concertId,
 				@PathVariable("scheduleId") Long scheduleId,
 				@ModelAttribute SeatRequest.SearchCondition searchCondition
-			) {
+	) {
 		return ResponseEntity.ok(seatService.getSeats(concertId, scheduleId, searchCondition));
 	}
 }

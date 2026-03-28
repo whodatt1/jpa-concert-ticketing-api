@@ -1,6 +1,5 @@
 package com.tiketing.api.concert.service;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -48,9 +47,7 @@ public class ConcertService {
 				.sum();
 		
 		// 수용인원 유효성 체크
-		if (venue.getCapacity() != null && totalRequestedSeats > venue.getCapacity()) {
-			throw new IllegalArgumentException("총 좌석 수(" + totalRequestedSeats + ")가 공연장 수용 인원(" + venue.getCapacity() + ")을 초과합니다.");
-		}
+		venue.validateCapacity(totalRequestedSeats);
 		
 		if (concertRepository.existsOverlappingConcert(venue.getVenueId(), request.startedAt(), request.endedAt())) {
 	        throw new IllegalArgumentException("해당 공연장의 대관 기간(" + request.startedAt().toLocalDate() + " ~ " + request.endedAt().toLocalDate() + ")에 이미 겹치는 콘서트 일정이 존재합니다.");

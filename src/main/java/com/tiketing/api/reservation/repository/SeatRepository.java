@@ -8,6 +8,7 @@ import org.springframework.data.repository.query.Param;
 
 import com.tiketing.api.concert.dto.SeatRequest;
 import com.tiketing.api.reservation.entity.Seat;
+import com.tiketing.api.reservation.enums.SeatStatus;
 
 public interface SeatRepository extends JpaRepository<Seat, Long>, SeatRepositoryCustom {
 	
@@ -24,4 +25,6 @@ public interface SeatRepository extends JpaRepository<Seat, Long>, SeatRepositor
             @Param("scheduleId") Long scheduleId,
             @Param("condition") SeatRequest.SearchCondition condition
     );
+
+	List<Seat> findAllByStatus(SeatStatus status);
 }

@@ -46,4 +46,25 @@ public class Seat extends BaseEntity {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "concert_schedule_id", nullable = false)
 	private ConcertSchedule concertSchedule;
+	
+	// 예매
+	public void reserve() {
+		if (this.getStatus() != SeatStatus.AVAILABLE) {
+			throw new IllegalStateException("예매할 수 없는 좌석입니다.");
+		}
+		this.status = SeatStatus.LOCKED;
+	}
+	
+	// 결제 후 확정
+	public void confirm() {
+		if (this.getStatus() != SeatStatus.LOCKED) {
+        	throw new IllegalStateException("결제할 수 없는 상태의 좌석입니다.");
+        }
+		this.status = SeatStatus.SOLD;
+	}
+	
+	// 락 해제 및 초기 상태로 원복
+	public void release() {
+		this.status = SeatStatus.AVAILABLE;
+	}
 }

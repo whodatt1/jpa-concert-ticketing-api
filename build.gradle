@@ -45,6 +45,8 @@ dependencies {
     
     // 외부 라이브러리: 쿼리 파라미터 매핑 출력 (p6spy)
     implementation 'com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.9.1'
+    // Redis 연동을 위한 의존성 추가
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 }
 
 // 1. Q클래스를 저장할 '폴더 위치'를 변수로 지정합니다.

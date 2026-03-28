@@ -41,4 +41,11 @@ public class Venue extends BaseEntity {
         this.capacity = capacity;
         this.address = address;
 	}
+	
+	// 수용인원 유효성 체크
+	public void validateCapacity(int totalRequestedSeats) {
+		if (this.capacity != null && totalRequestedSeats > this.capacity) {
+			throw new IllegalArgumentException("총 좌석 수(" + totalRequestedSeats + ")가 공연장 수용 인원(" + this.capacity + ")을 초과합니다.");
+		}
+	}
 }
