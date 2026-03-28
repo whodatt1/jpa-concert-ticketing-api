@@ -33,7 +33,8 @@ import lombok.NoArgsConstructor;
 @Table(
 		name = "concert",
 		indexes = {
-  					@Index(name = "idx_concert_search_all", columnList = "show_yn, del_yn, created_at")
+  					@Index(name = "idx_concert_search", columnList = "del_yn, created_at"),
+  					@Index(name = "idx_concert_venue_overlap", columnList = "venue_id, del_yn, started_at")
 			}
 		)
 @Getter

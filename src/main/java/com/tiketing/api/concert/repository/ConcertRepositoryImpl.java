@@ -49,18 +49,17 @@ public class ConcertRepositoryImpl implements ConcertRepositoryCustom {
 	@Override
 	public Slice<Concert> searchConcerts(SearchCondition condition, Pageable pageable) {
 		
-		// Querydsl을 이용한 콘서트 리스트 조회
 		List<Concert> contents = queryFactory
 				.selectFrom(concert)
 				// N:1 관계이므로 데이터 뻥튀기가 발생하지 않는 안전한 JOIN
 				.join(concert.venue, venue)
 				.where(
-						concertNameContains(condition.concertName()),
-						categoryIdsIn(condition.categoryIds()),
-						regionsIn(condition.regions()),
-						daysLeftLoe(condition.daysLeft()),
+						concert.delYn.eq("N"),
 						ratingEq(condition.rating()),
-						concert.delYn.eq("N")
+						categoryIdsIn(condition.categoryIds()),
+						concertNameContains(condition.concertName()),
+						regionsIn(condition.regions()),
+						daysLeftLoe(condition.daysLeft())
 				)
 				.orderBy(concert.createdAt.desc()) // 최신순 정렬
 				.offset(pageable.getOffset())

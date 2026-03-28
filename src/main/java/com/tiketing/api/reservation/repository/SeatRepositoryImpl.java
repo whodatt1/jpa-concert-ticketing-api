@@ -26,12 +26,8 @@ public class SeatRepositoryImpl implements SeatRepositoryCustom {
 		
 		return queryFactory
 				.selectFrom(seat)
-				.join(seat.concertSchedule, concertSchedule)
-				.join(concertSchedule.concert, concert)
 				.where(
-						concertScheduleIdEq(scheduleId),
-						concertIdEq(concertId),
-						
+						seat.concertSchedule.concertScheduleId.eq(scheduleId),
 						seatStatusEq(searchCondition.status()),
 						seatRatingEq(searchCondition.seatRating())
 				)
@@ -49,21 +45,5 @@ public class SeatRepositoryImpl implements SeatRepositoryCustom {
 		}
 		
 		return seat.status.eq(status);
-	}
-	
-	private BooleanExpression concertScheduleIdEq(Long scheduleId) {
-		if (scheduleId == null || scheduleId <= 0) {
-			return null;
-		}
-		
-		return concertSchedule.concertScheduleId.eq(scheduleId);
-	}
-	
-	private BooleanExpression concertIdEq(Long concertId) {
-		if (concertId == null || concertId <= 0) {
-			return null;
-		}
-		
-		return concert.concertId.eq(concertId);
 	}
 }

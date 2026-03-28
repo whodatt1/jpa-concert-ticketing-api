@@ -8,7 +8,7 @@ import lombok.Getter;
 @AllArgsConstructor(access = AccessLevel.PRIVATE) // 외부에서 new 생성자 사용 금지
 public class ErrorApiResponse {
 	
-	private final boolean success = true;
+	private final boolean success = false;
 	private final String errorCode;
 	private final String message; // 메시지
 	
