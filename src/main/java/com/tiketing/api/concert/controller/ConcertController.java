@@ -2,6 +2,7 @@ package com.tiketing.api.concert.controller;
 
 import java.util.List;
 
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.web.PageableDefault;
@@ -51,8 +52,8 @@ public class ConcertController {
 	@Operation(summary = "콘서트 목록 조회", description = "다양한 조건(지역, 이름, 마감일 등)으로 콘서트 목록을 조회합니다.") // API 설명
 	@GetMapping
 	public ResponseEntity<ApiResponse<Slice<ConcertResponse.Summary>>> searchConcerts(
-				@ModelAttribute ConcertRequest.SearchCondition searchCondition,
-				@PageableDefault(size = 10) Pageable pageable
+			@ParameterObject @ModelAttribute ConcertRequest.SearchCondition searchCondition,
+			@ParameterObject @PageableDefault(size = 10) Pageable pageable
 	) {
 		return ResponseEntity.ok(ApiResponse.success(concertService.searchConcerts(searchCondition, pageable)));
 	}
@@ -71,7 +72,7 @@ public class ConcertController {
 	public ResponseEntity<ApiResponse<List<SeatResponse.Summary>>> getSeats(
 				@PathVariable("id") Long concertId,
 				@PathVariable("scheduleId") Long scheduleId,
-				@ModelAttribute SeatRequest.SearchCondition searchCondition
+				@ParameterObject @ModelAttribute SeatRequest.SearchCondition searchCondition
 	) {
 		return ResponseEntity.ok(ApiResponse.success(seatService.getSeats(concertId, scheduleId, searchCondition)));
 	}
