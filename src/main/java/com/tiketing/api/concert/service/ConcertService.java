@@ -19,6 +19,8 @@ import com.tiketing.api.concert.entity.Venue;
 import com.tiketing.api.concert.repository.CategoryRepository;
 import com.tiketing.api.concert.repository.ConcertRepository;
 import com.tiketing.api.concert.repository.VenueRepository;
+import com.tiketing.api.global.exception.BusinessException;
+import com.tiketing.api.global.exception.ErrorCode;
 import com.tiketing.api.reservation.repository.SeatJdbcRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -39,7 +41,7 @@ public class ConcertService {
 		
 		// 공연장 검증
 		Venue venue = venueRepository.findById(request.venueId())
-				.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 공연장입니다."));
+				.orElseThrow(() -> new BusinessException(ErrorCode.VENUE_NOT_FOUND));
 		
 		// 좌석 요청값
 		int totalRequestedSeats = request.prices().stream()
@@ -50,7 +52,7 @@ public class ConcertService {
 		venue.validateCapacity(totalRequestedSeats);
 		
 		if (concertRepository.existsOverlappingConcert(venue.getVenueId(), request.startedAt(), request.endedAt())) {
-	        throw new IllegalArgumentException("해당 공연장의 대관 기간(" + request.startedAt().toLocalDate() + " ~ " + request.endedAt().toLocalDate() + ")에 이미 겹치는 콘서트 일정이 존재합니다.");
+	        throw new BusinessException(ErrorCode.SCHEDULE_OVERLAPPED);
 	    }
 		
 		Concert concert = Concert.builder()
@@ -65,7 +67,7 @@ public class ConcertService {
 		// 카테고리 조립
 		List<Category> categories = categoryRepository.findAllById(request.categoryIds());
 		if (categories.size() != request.categoryIds().size()) {
-			throw new IllegalArgumentException("유효하지 않은 카테고리 ID가 포함되어 있습니다.");
+			throw new BusinessException(ErrorCode.CATEGORY_NOT_FOUND);
 		}
 		for (Category category : categories) {
 			ConcertCategory concertCategory = ConcertCategory.builder()
@@ -131,7 +133,7 @@ public class ConcertService {
 	
 	public ConcertResponse.Detail getConcert(Long concertId) {
 		Concert concert = concertRepository.findById(concertId)
-				.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 콘서트입니다."));
+				.orElseThrow(() -> new BusinessException(ErrorCode.CONCERT_NOT_FOUND));
 		
 		return ConcertResponse.Detail.from(concert);
 	}

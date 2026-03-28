@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import com.tiketing.api.concert.dto.SeatRequest;
+import com.tiketing.api.reservation.dto.SeatRequest;
 import com.tiketing.api.reservation.entity.Seat;
 import com.tiketing.api.reservation.enums.SeatStatus;
 

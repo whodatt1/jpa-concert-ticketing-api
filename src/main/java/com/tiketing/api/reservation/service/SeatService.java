@@ -7,8 +7,10 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.tiketing.api.concert.dto.SeatRequest;
-import com.tiketing.api.concert.dto.SeatResponse;
+import com.tiketing.api.global.exception.BusinessException;
+import com.tiketing.api.global.exception.ErrorCode;
+import com.tiketing.api.reservation.dto.SeatRequest;
+import com.tiketing.api.reservation.dto.SeatResponse;
 import com.tiketing.api.reservation.entity.Seat;
 import com.tiketing.api.reservation.enums.SeatStatus;
 import com.tiketing.api.reservation.repository.SeatRepository;
@@ -45,16 +47,16 @@ public class SeatService {
 		
 		// 누군가 먼저 클릭해서 이미 열쇠가 있다면
 		if (Boolean.FALSE.equals(isLockAcquired)) {
-			throw new IllegalStateException("이미 선점되었거나 결제 진행 중인 좌석입니다.");
+			throw new BusinessException(ErrorCode.SEAT_ALREADY_LOCKED);
 		}
 		
 		// 1등으로 들어온 경우 DB 물리적 상태도 변경
 		Seat seat = seatRepository.findById(seatId)
-						.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 좌석입니다."));
+						.orElseThrow(() -> new BusinessException(ErrorCode.SEAT_NOT_FOUND));
 		
 		try {
 			seat.reserve(); // 엔티티에게 검증 및 상태 변경을 위임
-		} catch (IllegalStateException e) {
+		} catch (BusinessException e) {
 			// 엔티티가 AVAILABLE 예외를 던지면 Redis락을 제거 후 에러 전달
 			redisTemplate.delete(lockKey);
 			throw e;
@@ -76,7 +78,7 @@ public class SeatService {
 		}
 		
 		if (!lockedUserId.equals(String.valueOf(userId))) {
-			throw new IllegalArgumentException("해당 좌석의 락을 해제할 권한이 없습니다.");
+			throw new BusinessException(ErrorCode.LOCK_UNAUTHORIZED);
 		}
 		
 		// 권한 확인 후 Redis에서 락 제거
@@ -84,7 +86,7 @@ public class SeatService {
 		
 		// DB 상태 원복
 		Seat seat = seatRepository.findById(seatId)
-				.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 좌석입니다."));
+				.orElseThrow(() -> new BusinessException(ErrorCode.SEAT_NOT_FOUND));
 		
 		seat.release();
 	}

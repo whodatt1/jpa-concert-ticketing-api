@@ -2,12 +2,12 @@ package com.tiketing.api.concert.repository;
 
 import static com.tiketing.api.concert.entity.QConcert.concert;
 import static com.tiketing.api.concert.entity.QConcertCategory.concertCategory;
-import static com.tiketing.api.concert.entity.QVenue.venue;
 import static com.tiketing.api.concert.entity.QConcertSchedule.concertSchedule;
-import static com.tiketing.api.concert.entity.QConcertPrice.concertPrice;
+import static com.tiketing.api.concert.entity.QVenue.venue;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -110,7 +110,7 @@ public class ConcertRepositoryImpl implements ConcertRepositoryCustom {
 	}
 
 	// JOIN 대신 EXISTS 서브쿼리 도입!
-	private BooleanExpression categoryIdsIn(List<Long> categoryIds) {
+	private BooleanExpression categoryIdsIn(Set<Long> categoryIds) {
 		if (categoryIds == null || categoryIds.isEmpty()) {
 			return null;
 		}

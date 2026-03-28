@@ -2,6 +2,8 @@ package com.tiketing.api.reservation.entity;
 
 import com.tiketing.api.concert.entity.ConcertSchedule;
 import com.tiketing.api.global.entity.BaseEntity;
+import com.tiketing.api.global.exception.BusinessException;
+import com.tiketing.api.global.exception.ErrorCode;
 import com.tiketing.api.reservation.enums.SeatStatus;
 
 import jakarta.persistence.Column;
@@ -50,16 +52,16 @@ public class Seat extends BaseEntity {
 	// 예매
 	public void reserve() {
 		if (this.getStatus() != SeatStatus.AVAILABLE) {
-			throw new IllegalStateException("예매할 수 없는 좌석입니다.");
+			throw new BusinessException(ErrorCode.SEAT_ALREADY_LOCKED);
 		}
 		this.status = SeatStatus.LOCKED;
 	}
 	
 	// 결제 후 확정
 	public void confirm() {
-		if (this.getStatus() != SeatStatus.LOCKED) {
-        	throw new IllegalStateException("결제할 수 없는 상태의 좌석입니다.");
-        }
+		if (this.status != SeatStatus.LOCKED) {
+			throw new BusinessException(ErrorCode.INVALID_SEAT_STATUS); 
+		}
 		this.status = SeatStatus.SOLD;
 	}
 	

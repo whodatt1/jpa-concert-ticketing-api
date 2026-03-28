@@ -1,4 +1,4 @@
-package com.tiketing.api.concert.dto;
+package com.tiketing.api.reservation.dto;
 
 import com.tiketing.api.reservation.enums.SeatStatus;
 

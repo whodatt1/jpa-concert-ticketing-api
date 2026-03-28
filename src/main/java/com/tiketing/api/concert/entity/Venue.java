@@ -2,6 +2,8 @@ package com.tiketing.api.concert.entity;
 
 import com.tiketing.api.global.entity.Address;
 import com.tiketing.api.global.entity.BaseEntity;
+import com.tiketing.api.global.exception.BusinessException;
+import com.tiketing.api.global.exception.ErrorCode;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
@@ -45,7 +47,7 @@ public class Venue extends BaseEntity {
 	// 수용인원 유효성 체크
 	public void validateCapacity(int totalRequestedSeats) {
 		if (this.capacity != null && totalRequestedSeats > this.capacity) {
-			throw new IllegalArgumentException("총 좌석 수(" + totalRequestedSeats + ")가 공연장 수용 인원(" + this.capacity + ")을 초과합니다.");
+			throw new BusinessException(ErrorCode.CAPACITY_EXCEEDED);
 		}
 	}
 }

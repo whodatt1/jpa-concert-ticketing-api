@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Set;
 
 import com.tiketing.api.concert.enums.ConcertRating;
 
@@ -20,7 +21,7 @@ public class ConcertRequest {
 	@Schema(name = "ConcertSearchCondition")
 	public record SearchCondition(
 		String concertName,
-		List<Long> categoryIds,
+		Set<Long> categoryIds,
 		List<String> regions,
 		Integer daysLeft,
 		ConcertRating rating

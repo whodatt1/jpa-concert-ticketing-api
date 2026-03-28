@@ -4,6 +4,8 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.tiketing.api.global.exception.BusinessException;
+import com.tiketing.api.global.exception.ErrorCode;
 import com.tiketing.api.reservation.entity.Seat;
 import com.tiketing.api.reservation.enums.SeatStatus;
 import com.tiketing.api.reservation.repository.SeatRepository;
@@ -32,12 +34,12 @@ public class PaymentService {
 			
 			log.info("시간 초과로 인한 락 소유권 상실");
 			
-			throw new IllegalStateException("결제 가능 시간(5분)이 초과되어 결제가 자동 취소되었습니다.");
+			throw new BusinessException(ErrorCode.PAYMENT_TIMEOUT);
 		}
 		
 		// 검즘 완료 후 자리 확정 작업 진행
         Seat seat = seatRepository.findById(seatId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 좌석입니다."));
+                .orElseThrow(() -> new BusinessException(ErrorCode.SEAT_NOT_FOUND));
         
         seat.confirm();
         

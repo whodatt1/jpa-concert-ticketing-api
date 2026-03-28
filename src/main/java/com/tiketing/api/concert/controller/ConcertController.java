@@ -17,9 +17,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.tiketing.api.concert.dto.ConcertRequest;
 import com.tiketing.api.concert.dto.ConcertResponse;
-import com.tiketing.api.concert.dto.SeatRequest;
-import com.tiketing.api.concert.dto.SeatResponse;
 import com.tiketing.api.concert.service.ConcertService;
+import com.tiketing.api.global.response.ApiResponse;
+import com.tiketing.api.reservation.dto.SeatRequest;
+import com.tiketing.api.reservation.dto.SeatResponse;
 import com.tiketing.api.reservation.service.SeatService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -38,39 +39,40 @@ public class ConcertController {
 	
 	@Operation(summary = "콘서트 생성", description = "새로운 콘서트와 관련 카테고리, 스케줄, 가격, 그리고 수만 개의 좌석 정보를 한 번에 생성합니다.")
 	@PostMapping
-	public ResponseEntity<Long> createConcert(@Valid @RequestBody ConcertRequest.Create request) {
+	public ResponseEntity<ApiResponse<Long>> createConcert(@Valid @RequestBody ConcertRequest.Create request) {
 		
 		// Service 로직 호출
 		Long concertId = concertService.createConcert(request);
 		
-		return ResponseEntity.status(HttpStatus.CREATED).body(concertId);
+		return ResponseEntity.status(HttpStatus.CREATED)
+				.body(ApiResponse.success("콘서트가 성공적으로 생성되었습니다.", concertId));
 	}
 	
 	@Operation(summary = "콘서트 목록 조회", description = "다양한 조건(지역, 이름, 마감일 등)으로 콘서트 목록을 조회합니다.") // API 설명
 	@GetMapping
-	public ResponseEntity<Slice<ConcertResponse.Summary>> searchConcerts(
+	public ResponseEntity<ApiResponse<Slice<ConcertResponse.Summary>>> searchConcerts(
 				@ModelAttribute ConcertRequest.SearchCondition searchCondition,
 				@PageableDefault(size = 10) Pageable pageable
 	) {
-		return ResponseEntity.ok(concertService.searchConcerts(searchCondition, pageable));
+		return ResponseEntity.ok(ApiResponse.success(concertService.searchConcerts(searchCondition, pageable)));
 	}
 	
 	@Operation(summary = "콘서트 디테일 조회", description = "콘서트 상세 정보를 조회합니다.")
 	@GetMapping("/{id}")
-	public ResponseEntity<ConcertResponse.Detail> getConcert(
+	public ResponseEntity<ApiResponse<ConcertResponse.Detail>> getConcert(
 				@PathVariable("id") Long concertId
 	) {
-		return ResponseEntity.ok(concertService.getConcert(concertId));
+		return ResponseEntity.ok(ApiResponse.success(concertService.getConcert(concertId)));
 	}
 	
 	
 	@Operation(summary = "좌석 맵 조회", description = "특정 콘서트의 특정 스케쥴 좌석 맵을 조회합니다.")
 	@GetMapping("/{id}/schedules/{scheduleId}/seats")
-	public ResponseEntity<List<SeatResponse.Summary>> getSeats(
+	public ResponseEntity<ApiResponse<List<SeatResponse.Summary>>> getSeats(
 				@PathVariable("id") Long concertId,
 				@PathVariable("scheduleId") Long scheduleId,
 				@ModelAttribute SeatRequest.SearchCondition searchCondition
 	) {
-		return ResponseEntity.ok(seatService.getSeats(concertId, scheduleId, searchCondition));
+		return ResponseEntity.ok(ApiResponse.success(seatService.getSeats(concertId, scheduleId, searchCondition)));
 	}
 }

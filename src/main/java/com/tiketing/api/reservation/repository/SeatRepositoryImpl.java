@@ -10,7 +10,7 @@ import static com.tiketing.api.concert.entity.QConcert.concert;
 import static com.tiketing.api.concert.entity.QConcertSchedule.concertSchedule;
 import static com.tiketing.api.reservation.entity.QSeat.seat;
 
-import com.tiketing.api.concert.dto.SeatRequest;
+import com.tiketing.api.reservation.dto.SeatRequest;
 import com.tiketing.api.reservation.entity.Seat;
 import com.tiketing.api.reservation.enums.SeatStatus;
 
