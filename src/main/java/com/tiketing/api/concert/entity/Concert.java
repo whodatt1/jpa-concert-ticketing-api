@@ -5,10 +5,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.SQLRestriction;
-import org.springframework.data.annotation.CreatedDate;
 
 import com.tiketing.api.concert.enums.ConcertRating;
+import com.tiketing.api.global.entity.Address;
 import com.tiketing.api.global.entity.BaseEntity;
 
 import jakarta.persistence.CascadeType;
@@ -16,17 +15,28 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "concert")
+@Table(
+		name = "concert",
+		indexes = {
+  					@Index(name = "idx_concert_search", columnList = "del_yn, created_at"),
+  					@Index(name = "idx_concert_venue_overlap", columnList = "venue_id, del_yn, started_at")
+			}
+		)
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 // JPA delete 호출 시 del_yn를 Y처리하여 Soft Delete 자동화
@@ -43,6 +53,10 @@ public class Concert extends BaseEntity {
 	
 	@Column(name = "concert_description")
 	private String concertDescription;
+	
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "venue_id", nullable = false)
+	private Venue venue;
 	
 	@Enumerated(EnumType.STRING)
 	@Column(name = "rating", nullable = false)
@@ -81,5 +95,16 @@ public class Concert extends BaseEntity {
 	public void addSchedule(ConcertSchedule concertSchedule) {
 		this.schedules.add(concertSchedule);
 		concertSchedule.setConcert(this);
+	}
+	
+	@Builder
+	public Concert(String concertName, String concertDescription, Venue venue, ConcertRating rating,
+			LocalDateTime startedAt, LocalDateTime endedAt) {
+		this.concertName = concertName;
+		this.concertDescription = concertDescription;
+		this.venue = venue;
+		this.rating = rating;
+		this.startedAt = startedAt;
+		this.endedAt = endedAt;
 	}
 }

@@ -2,6 +2,8 @@ package com.tiketing.api.reservation.entity;
 
 import com.tiketing.api.concert.entity.ConcertSchedule;
 import com.tiketing.api.global.entity.BaseEntity;
+import com.tiketing.api.global.exception.BusinessException;
+import com.tiketing.api.global.exception.ErrorCode;
 import com.tiketing.api.reservation.enums.SeatStatus;
 
 import jakarta.persistence.Column;
@@ -12,6 +14,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
@@ -20,7 +23,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "seat")
+@Table(
+		name = "seat",
+		indexes = {
+					@Index(name = "idx_seat_search", columnList = "concert_schedule_id")
+			}
+	    )
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Seat extends BaseEntity {
@@ -47,7 +55,24 @@ public class Seat extends BaseEntity {
 	@JoinColumn(name = "concert_schedule_id", nullable = false)
 	private ConcertSchedule concertSchedule;
 	
-	public void setConcertSchedule(ConcertSchedule concertSchedule) {
-		this.concertSchedule = concertSchedule;
+	// 예매
+	public void reserve() {
+		if (this.getStatus() != SeatStatus.AVAILABLE) {
+			throw new BusinessException(ErrorCode.SEAT_ALREADY_LOCKED);
+		}
+		this.status = SeatStatus.LOCKED;
+	}
+	
+	// 결제 후 확정
+	public void confirm() {
+		if (this.status != SeatStatus.LOCKED) {
+			throw new BusinessException(ErrorCode.INVALID_SEAT_STATUS); 
+		}
+		this.status = SeatStatus.SOLD;
+	}
+	
+	// 락 해제 및 초기 상태로 원복
+	public void release() {
+		this.status = SeatStatus.AVAILABLE;
 	}
 }
