@@ -41,7 +41,7 @@ dependencies {
     annotationProcessor "jakarta.persistence:jakarta.persistence-api"
     
     // Swagger (Springdoc OpenAPI) - Spring Boot 3 전용
-    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.4.0'
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.9'
     
     // 외부 라이브러리: 쿼리 파라미터 매핑 출력 (p6spy)
     implementation 'com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.9.1'
