@@ -7,6 +7,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -29,6 +30,12 @@ public class SeatServiceConcurrencyTest {
     // 매 테스트가 실행되기 직전에 Redis를 깔끔하게 비워주기
     @BeforeEach
     void setUp() {
+        redisTemplate.getConnectionFactory().getConnection().serverCommands().flushAll();
+    }
+    
+    // 테스트가 종료된 직후에도 Redis를 비워주어 다른 테스트에 영향을 주지 않도록 격리
+    @AfterEach
+    void tearDown() {
         redisTemplate.getConnectionFactory().getConnection().serverCommands().flushAll();
     }
 	
