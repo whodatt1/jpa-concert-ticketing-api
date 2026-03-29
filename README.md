@@ -27,11 +27,11 @@ cd [프로젝트 폴더명]
 docker-compose up -d
 
 # Windows (CMD / PowerShell)
-.\gradlew clean build -x test
+.\gradlew clean build
 .\gradlew bootRun
 
 # Mac / Linux (Terminal)
-./gradlew clean build -x test 
+./gradlew clean build
 ./gradlew bootRun
 ```
 
@@ -66,7 +66,31 @@ docker-compose up -d
 - **Global Exception:** `@RestControllerAdvice`를 활용한 전역 예외 처리 및 공통 응답 규격(ApiResponse/ApiErrorResponse)을 적용하여 혼란을 최소화.
 - **Swagger 문서화:** `@ParameterObject`를 통해 `record`객체 및 페이징 파라미터를 명시적으로 노출, 마스터 데이터(카테고리, 공연장 ID)의 Example 값을 주입하여 API 테스트 편의성을 극대화.
 
-## 5. 프로젝트 구조
+## 5. 테스트 성능 및 검증
+
+### [1] 분산 락 동시성 제어 통합 테스트
+
+- **목적:** 다수의 사용자가 동시에 동일한 좌석을 선점할 경우 발생할 수 있는 동시성 문제를 방지하고, Redis 분산 락의 정합성을 검증.
+- **구현 방식:** `@SpringBootTest`환경에서 멀티 쓰레딩(`ExecutorService`, `CountDownLatch`)을 활용하여, 100명의 유저가 동시에 단 1개의 좌석(ID:1)을 선점하는 상황을 시뮬레이션하는 통합테스트를 작성.
+- **검증 결과:** 100건의 동시 요청 중 단 1건만 예매에 성공하고, 나머지 99건은 락 획득 실패로 인한 예외(`BusinessException`)가 정상적으로 발생함을 확인.
+
+### [2] JMeter를 활용한 부하 테스트
+
+- **목적:** 실제 어플리케이션에 적용된 동시성 제어 로직이 안정적으로 작동하는지 확인하기 위해수행하였습니다.
+- **주요 검증 항목 및 결과:** Redis 분산 락을 적용한 동시 예매 상황 검증
+	- 100명의 사용자가 동시에 동일한 좌석 예매를 요청하는 상황(Synchronizing Timer 활용)을 시뮬레이션.
+	- **검증 결과:** 단 1건의 요청만 처리되고, 나머지 요청은 Redis Lock에 의해 `SEAT_ALREADY_LOCK`예외를 반환하며 동시성 문제가 방어됨을 확인.
+	- **성능 지표:** 해당 동시성 제어 환경에서 평균 응답 속도 745ms, 처리량 127.7 TPS를 기록.
+
+**1. 동시성 제어 예외 발생 확인 (View Results Tree)**
+
+![JMeter View Results Tree](./images/JMETER_VIEW_RESULT_TREE.png)
+
+**2. 전체 트래픽 처리 성능 (Summary Report)**
+
+![JMeter Summary Report](./images/JMETER_SUMMARY_REPORT.png)
+
+## 6. 프로젝트 구조
 
 
 ```text
