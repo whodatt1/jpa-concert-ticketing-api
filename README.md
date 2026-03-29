@@ -27,11 +27,11 @@ cd [프로젝트 폴더명]
 docker-compose up -d
 
 # Windows (CMD / PowerShell)
-.\gradlew clean build -x test
+.\gradlew clean build
 .\gradlew bootRun
 
 # Mac / Linux (Terminal)
-./gradlew clean build -x test 
+./gradlew clean build
 ./gradlew bootRun
 ```
 
@@ -83,9 +83,11 @@ docker-compose up -d
 	- **성능 지표:** 해당 동시성 제어 환경에서 평균 응답 속도 745ms, 처리량 127.7 TPS를 기록.
 
 **1. 동시성 제어 예외 발생 확인 (View Results Tree)**
+
 ![JMeter View Results Tree](./images/JMETER_VIEW_RESULT_TREE.png)
 
 **2. 전체 트래픽 처리 성능 (Summary Report)**
+
 ![JMeter Summary Report](./images/JMETER_SUMMARY_REPORT.png)
 
 ## 6. 프로젝트 구조
