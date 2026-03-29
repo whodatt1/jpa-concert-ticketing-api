@@ -33,6 +33,46 @@ dependencies {
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+	
+	// Querydsl 관련 의존성
+    implementation 'com.querydsl:querydsl-jpa:5.1.0:jakarta'
+    annotationProcessor "com.querydsl:querydsl-apt:5.1.0:jakarta"
+    annotationProcessor "jakarta.annotation:jakarta.annotation-api"
+    annotationProcessor "jakarta.persistence:jakarta.persistence-api"
+    
+    // Swagger (Springdoc OpenAPI) - Spring Boot 3 전용
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.9'
+    
+    // 외부 라이브러리: 쿼리 파라미터 매핑 출력 (p6spy)
+    implementation 'com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.9.1'
+    // Redis 연동을 위한 의존성 추가
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+}
+
+// 1. Q클래스를 저장할 '폴더 위치'를 변수로 지정합니다.
+// $buildDir은 보통 프로젝트 내의 'build' 폴더를 의미
+// 즉, "build/generated/querydsl" 이라는 경로를 querydslDir 변수에 담아둔 것
+def querydslDir = "$buildDir/generated/querydsl"
+
+// 2. 스프링에 자바 코드가 있는 곳이라고 알려줌.
+sourceSets {
+    main.java.srcDirs += [ querydslDir ]
+    // 기본 소스 경로(src/main/java)에 아까 만든 Q클래스 폴더를 추가.
+}
+
+// 3. 자바 컴파일러에게 Q클래스를 어디에 뱉어낼지 지시
+tasks.withType(JavaCompile) {
+	// 코드를 컴파일할 때 발생하는 생성물(Q클래스 등)을 
+    // 우리가 지정한 폴더(querydslDir)에 집어넣으라는 명령.
+    options.getGeneratedSourceOutputDirectory().set(file(querydslDir))
+}
+
+// 4. 프로젝트 청소(clean)할 때 이 폴더도 같이 밀어버리라고 지시
+clean {
+	// 터미널에서 './gradlew clean'을 치면 기존 빌드 파일들이 지워지는데, 
+    // 이때 Q클래스 폴더도 깔끔하게 삭제해달라 요청
+    // 엔티티 구조를 바꿨을 때 과거의 찌꺼기 Q클래스가 남아서 에러 내는 걸 방지.
+    delete file(querydslDir)
 }
 
 tasks.named('test') {

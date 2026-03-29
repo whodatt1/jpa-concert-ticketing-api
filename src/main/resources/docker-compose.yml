@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  # 우리가 띄울 Redis 컨테이너 이름
+  redis:
+    image: redis:latest # 도커 허브에서 가져올 공식 이미지
+    container_name: ticketing-redis
+    ports:
+      - "6379:6379" # 외부(스프링) 포트 : 내부(도커) 포트
+    volumes:
+      - redis-data:/data # 컨테이너가 꺼져도 데이터가 날아가지 않도록 로컬에 저장
+    command: redis-server --appendonly yes # Redis가 데이터를 디스크에 주기적으로 쓰도록 설정
+    restart: always # 도커가 켜지면 알아서 항상 재시작되도록 설정
+    
+volumes:
+  redis-data: # 위에서 쓴 볼륨 선언
