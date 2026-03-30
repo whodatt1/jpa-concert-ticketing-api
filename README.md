@@ -92,40 +92,20 @@ docker-compose up -d
 
 ## 6. 프로젝트 구조
 
-
 ```text
 .
 ├── src
 │   ├── main
 │   │   ├── java/com/tiketing/api
-│   │   │   ├── concert              # [공연 도메인] 공연, 공연장, 일정 관리
-│   │   │   │   ├── controller       # API 엔드포인트 (ConcertController)
-│   │   │   │   ├── dto              # 요청/응답 데이터 객체
-│   │   │   │   ├── entity           # JPA 엔티티 (Concert, Venue, Category 등)
-│   │   │   │   ├── enums            # 도메인 상수 (Rating, Status)
-│   │   │   │   └── repository       # 데이터 접근 계층 (Querydsl 포함)
-│   │   │   │
-│   │   │   ├── reservation          # [예약 도메인] 좌석 예점유 및 예약 로직
-│   │   │   │   ├── controller       # SeatController
-│   │   │   │   ├── entity           # Seat 엔티티
-│   │   │   │   ├── repository       # JDBC Bulk Insert 및 Querydsl 구현체
-│   │   │   │   ├── scheduler        # 좌석 복구 스케줄러 (SeatRecovery)
-│   │   │   │   └── service          # 핵심 예약 비즈니스 로직
-│   │   │   │
-│   │   │   ├── payment              # [결제 도메인] 결제 프로세스 관리
-│   │   │   │   ├── controller       # PaymentController
-│   │   │   │   └── service          # PaymentService
-│   │   │   │
-│   │   │   └── global               # [공통 모듈] 전역 설정 및 유틸리티
-│   │   │       ├── config           # Querydsl, Swagger 등 외부 설정
-│   │   │       ├── exception        # 공통 예외 처리 (GlobalExceptionHandler)
-│   │   │       ├── init             # 초기 데이터 로딩 (DataLoader)
-│   │   │       └── response         # 공통 API 응답 규격 (ApiResponse)
+│   │   │   ├── concert            # 공연 정보, 공연장, 회차별 일정 관리
+│   │   │   ├── reservation        # 좌석 선점 로직 및 스케줄러 관리
+│   │   │   ├── payment            # 가상 결제 프로세스 처리
+│   │   │   └── global             # 전역 예외 처리(Exception), 공통 응답(Response), 설정(Config)
 │   │   │
-│   │   └── resources
-│   │       ├── application.yaml     # 어플리케이션 설정
-│   │       └── docker-compose.yml   # 인프라 구성 (DB 등)
+│   │   └── resources              # application.yaml, docker-compose 등 설정 파일
 │   │
-│   └── test                         # 단위 및 통합 테스트 코드
-└── build.gradle                     # Gradle 의존성 및 프로젝트 빌드 설정
+│   └── test/java/com/tiketing/api
+│       └── service                # 핵심 비즈니스 로직 동시성(Concurrency) 테스트
+│
+└── build.gradle                   # 의존성 및 프로젝트 빌드 구성
 ```
