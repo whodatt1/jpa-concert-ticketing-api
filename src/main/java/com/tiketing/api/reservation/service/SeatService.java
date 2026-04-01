@@ -11,8 +11,11 @@ import com.tiketing.api.global.exception.BusinessException;
 import com.tiketing.api.global.exception.ErrorCode;
 import com.tiketing.api.reservation.dto.SeatRequest;
 import com.tiketing.api.reservation.dto.SeatResponse;
+import com.tiketing.api.reservation.entity.Reservation;
 import com.tiketing.api.reservation.entity.Seat;
+import com.tiketing.api.reservation.enums.ReservationStatus;
 import com.tiketing.api.reservation.enums.SeatStatus;
+import com.tiketing.api.reservation.repository.ReservationRepository;
 import com.tiketing.api.reservation.repository.SeatRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -22,6 +25,7 @@ import lombok.RequiredArgsConstructor;
 public class SeatService {
 	
 	private final SeatRepository seatRepository;
+	private final ReservationRepository reservationRepository;
 	private final StringRedisTemplate redisTemplate;
 	
 	// 특정 회차 좌석 맵 조회
@@ -56,6 +60,12 @@ public class SeatService {
 		
 		try {
 			seat.reserve(); // 엔티티에게 검증 및 상태 변경을 위임
+			
+			// PENDING 상태 이력 저장
+			reservationRepository.save(Reservation.builder()
+											      .userId(userId)
+											      .seat(seat)
+											      .build());
 		} catch (BusinessException e) {
 			// 엔티티가 AVAILABLE 예외를 던지면 Redis락을 제거 후 에러 전달
 			redisTemplate.delete(lockKey);
@@ -89,5 +99,9 @@ public class SeatService {
 				.orElseThrow(() -> new BusinessException(ErrorCode.SEAT_NOT_FOUND));
 		
 		seat.release();
+		
+		// 취소할 예매 내역이 있다면 취소 상태로 업데이트
+		reservationRepository.findBySeat_SeatIdAndUserIdAndStatus(seatId, userId, ReservationStatus.PENDING)
+						.ifPresent(Reservation::cancel);
 	}
 }

@@ -6,8 +6,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.tiketing.api.global.exception.BusinessException;
 import com.tiketing.api.global.exception.ErrorCode;
+import com.tiketing.api.reservation.entity.Reservation;
 import com.tiketing.api.reservation.entity.Seat;
+import com.tiketing.api.reservation.enums.ReservationStatus;
 import com.tiketing.api.reservation.enums.SeatStatus;
+import com.tiketing.api.reservation.repository.ReservationRepository;
 import com.tiketing.api.reservation.repository.SeatRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -19,6 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 public class PaymentService {
 	
 	private final SeatRepository seatRepository;
+	private final ReservationRepository reservationRepository;
 	private final StringRedisTemplate redisTemplate;
 	
 	// 결제를 마치고 승인을 기다리는 로직이라고 가정한다.
@@ -42,6 +46,11 @@ public class PaymentService {
                 .orElseThrow(() -> new BusinessException(ErrorCode.SEAT_NOT_FOUND));
         
         seat.confirm();
+        
+        Reservation reservation = reservationRepository.findBySeat_SeatIdAndUserIdAndStatus(seatId, userId, ReservationStatus.PENDING)
+        						.orElseThrow(() -> new BusinessException(ErrorCode.RESERVATION_NOT_FOUND));
+        
+        reservation.complete();
         
         redisTemplate.delete(lockKey);
         

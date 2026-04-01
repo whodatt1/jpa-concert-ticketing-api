@@ -2,6 +2,7 @@ package com.tiketing.api.reservation.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -16,6 +17,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.core.StringRedisTemplate;
 
 import com.tiketing.api.global.exception.BusinessException;
+import com.tiketing.api.reservation.entity.Reservation;
+import com.tiketing.api.reservation.entity.Seat;
+import com.tiketing.api.reservation.repository.ReservationRepository;
+import com.tiketing.api.reservation.repository.SeatRepository;
 
 @SpringBootTest // 통합 테스트
 public class SeatServiceConcurrencyTest {
@@ -25,7 +30,13 @@ public class SeatServiceConcurrencyTest {
 	
 	// Redis 제어를 위한 템플릿 주입
     @Autowired
-    private StringRedisTemplate redisTemplate; 
+    private StringRedisTemplate redisTemplate;
+    
+    @Autowired
+	private SeatRepository seatRepository;
+    
+ 	@Autowired
+ 	private ReservationRepository reservationRepository;
 
     // 매 테스트가 실행되기 직전에 Redis를 깔끔하게 비워주기
     @BeforeEach
@@ -37,6 +48,13 @@ public class SeatServiceConcurrencyTest {
     @AfterEach
     void tearDown() {
         redisTemplate.getConnectionFactory().getConnection().serverCommands().flushAll();
+        
+        reservationRepository.deleteAllInBatch();
+        
+        // 1번 좌석 상태 원래대로 복구
+ 		Seat seat = seatRepository.findById(1L).orElseThrow();
+ 		seat.release(); // AVAILABLE로 원복
+ 		seatRepository.save(seat);
     }
 	
 	@Test
@@ -96,5 +114,14 @@ public class SeatServiceConcurrencyTest {
         // 최종 (Assert)
         assertThat(successCount.get()).isEqualTo(1);
         assertThat(failCount.get()).isEqualTo(99);
+        
+        // 예매 엔티티 추가로 인한 추가 검증 로직
+        List<Reservation> reservations = reservationRepository.findAll();
+        
+        // 예매 내역이 정확히 1개 생성되었는지 검증
+        assertThat(reservations).hasSize(1);
+        
+        // 그 1개의 예매 내역이 대상 좌석에 대한 것인지 검증
+        assertThat(reservations.get(0).getSeat().getSeatId()).isEqualTo(targetSeatId);
 	}
 }
