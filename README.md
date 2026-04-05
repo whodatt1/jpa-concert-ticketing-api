@@ -61,11 +61,11 @@ docker-compose up -d
 
 ### [4] Querydsl과 인덱스 튜닝을 통한 조회 성능 극대화
 
-- **N+1 및 데이터 뻥튀기 방지:** 콘서트 디테일 조회 시 `MultipleBagFetchException`을 차단하기 위해 스케줄(Schedule)은 `fetchJoin`으로 가격(Price)은 `default_batch_fetch_size`를 활용한 지연 로딩으로 최적화.
+- **N+1 및 데이터 뻥튀기 방지:** 콘서트 디테일 조회 시 `MultipleBagFetchException`을 방지하기 위해 스케줄(Schedule)은 `fetchJoin`으로 가격(Price)은 `default_batch_fetch_size`를 활용한 지연 로딩으로 최적화.
 - **서브쿼리 튜닝:** 카테고리 필터링 조회 시 N:M 테이블 JOIN으로 인한 데이터 중복을 방지하고자 `EXISTS`서브쿼리로 리팩토링.
 - **인덱스 튜닝:** 
 	- **콘서트 목록:** 정렬 최적화를 위해 `(del_yn, created_at)`복합 인덱스 적용
-	- **좌석 맵:** 잦은 업데이트가 발생하는 상태(`status`) 컬럼을 배제하고 단일 컬럼(`conert_schedule_id`)으로 인덱스를 재설계하여 최적화
+	- **좌석 맵:** 잦은 업데이트가 발생하는 상태(`status`) 컬럼을 배제하고 단일 컬럼(`concert_schedule_id`)으로 인덱스를 재설계하여 최적화
 
 ### [5] 안정적인 API 환경 및 Swagger 고도화
 
@@ -73,8 +73,6 @@ docker-compose up -d
 - **Swagger 문서화:** `@ParameterObject`를 통해 `record`객체 및 페이징 파라미터를 명시적으로 노출, 마스터 데이터(카테고리, 공연장 ID)의 Example 값을 주입하여 API 테스트 편의성을 극대화.
 
 ## 5. 테스트 성능 및 검증
-
-### 5. 테스트 성능 및 검증
 
 #### [1] 분산 락 및 낙관적 락 통합 동시성 테스트
 - **목적:** 100명의 사용자가 동시에 동일한 좌석에 접근하는 상황을 시뮬레이션하여, 시스템의 데이터 정합성과 보호 메커니즘을 검증.
