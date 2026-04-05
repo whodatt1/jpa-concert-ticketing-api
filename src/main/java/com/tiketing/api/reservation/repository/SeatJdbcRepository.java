@@ -18,8 +18,8 @@ public class SeatJdbcRepository {
 	
 	public void batchInsertSeats(List<SeatBatchDto> seats) {
 		
-		String sql = "INSERT INTO seat (concert_schedule_id, seat_name, seat_rating, seat_price, seat_status, created_at, updated_at) " +
-                "VALUES (?, ?, ?, ?, 'AVAILABLE', NOW(), NOW())";
+		String sql = "INSERT INTO seat (concert_schedule_id, seat_name, seat_rating, seat_price, seat_status, version, created_at, updated_at) " +
+                "VALUES (?, ?, ?, ?, 'AVAILABLE', 0, NOW(), NOW())";
 		
 		jdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter() {
 			

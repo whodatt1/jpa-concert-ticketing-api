@@ -1,5 +1,6 @@
 package com.tiketing.api.reservation.entity;
 
+import com.tiketing.api.global.entity.BaseEntity;
 import com.tiketing.api.reservation.enums.ReservationStatus;
 
 import jakarta.persistence.Column;
@@ -22,7 +23,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "reservation")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Reservation {
+public class Reservation extends BaseEntity {
 	
 	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

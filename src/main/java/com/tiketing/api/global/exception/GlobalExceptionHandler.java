@@ -2,6 +2,9 @@ package com.tiketing.api.global.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
+import org.springframework.transaction.TransactionTimedOutException;
+import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -47,4 +50,24 @@ public class GlobalExceptionHandler {
         		.status(HttpStatus.INTERNAL_SERVER_ERROR)
         		.body(ErrorApiResponse.of("INTERNAL SERVER ERROR", "서버 내부에서 에러가 발생했습니다. 관리자에게 문의해주세요."));
 	}
+	
+	// 낙관적 락 예외 처리
+    @ExceptionHandler(ObjectOptimisticLockingFailureException.class)
+    public ResponseEntity<ErrorApiResponse> handleOptimisticLockException(ObjectOptimisticLockingFailureException e) {
+        log.warn("ObjectOptimisticLockingFailureException : {}", e.getMessage());
+        
+        return ResponseEntity
+        		.status(HttpStatus.CONFLICT)
+        		.body(ErrorApiResponse.of("CONCURRENCY_CONFLICT", "이미 예매가 진행 중인 좌석입니다. 다시 시도해 주세요."));
+    }
+
+    // 트랜잭션 타임아웃 예외 처리
+    @ExceptionHandler(TransactionTimedOutException.class)
+    public ResponseEntity<ErrorApiResponse> handleTransactionTimeoutException(TransactionTimedOutException e) {
+        log.error("TransactionTimedOutException : {}", e.getMessage());
+        
+        return ResponseEntity
+        		.status(HttpStatus.SERVICE_UNAVAILABLE)
+        		.body(ErrorApiResponse.of("TRANSACTION_TIMEOUT", "요청자가 많아 처리가 지연되고 있습니다. 잠시 후 다시 시도해 주세요."));
+    }
 }
