@@ -22,8 +22,14 @@ public enum ErrorCode {
 	INVALID_SEAT_STATUS(HttpStatus.BAD_REQUEST, "결제할 수 없는 상태의 좌석입니다."),
 	LOCK_UNAUTHORIZED(HttpStatus.FORBIDDEN, "해당 좌석의 락을 해제할 권한이 없습니다."),
 	
+	// Reservation
+	RESERVATION_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 예매입니다."),
+	
 	// Payment
-	PAYMENT_TIMEOUT(HttpStatus.BAD_REQUEST, "결제 가능 시간이 초과되어 취소되었습니다.");
+	PAYMENT_TIMEOUT(HttpStatus.BAD_REQUEST, "결제 가능 시간이 초과되어 취소되었습니다."),
+	
+	// Lock
+	LOCK_ACQUISITION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "일시적인 시스템 오류로 좌석 선점에 실패했습니다. 잠시 후 다시 시도해 주세요.");
 	
 	private final HttpStatus httpStatus;
 	private final String message;
