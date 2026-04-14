@@ -59,7 +59,12 @@ docker-compose up -d
 - **문제:** 기존 `Lettuce` 환경에서는 Redis 락의 TTL(5분)을 결제 대기 시간으로 그대로 사용했으나, `Redisson` 도입으로 락을 단순 '동시성 방어용'으로 역할을 분리하면서 더 이상 Redis 인프라를 통해 비즈니스 타임아웃을 추적할 수 없게 됨.
 - **해결:** 결제 대기 시간 관리의 책임을 Redis(인프라)에서 DB(도메인) 영역으로 완전 이관. 스케줄러의 Redis 의존성을 제거하고, `Reservation` 엔티티에 생성 시간(`createdAt`)을 추가하여 1분마다 DB를 조회, '생성된 지 5분이 지난 PENDING 상태의 예매'만 일괄 취소(`CANCEL`) 및 좌석 원복(`AVAILABLE`)하도록 전면 재설계.
 
-### [4] Querydsl과 인덱스 튜닝을 통한 조회 성능 극대화
+### [4] Facade 계층 분리로 인한 DB 커넥션 효율화
+
+- **문제:** 기존 `@Transactional` 내부에서 분산 락을 획득할 경우, Redis 네트워크 통신 대기 시간 동안 DB 커넥션을 점유하게 됨.
+- **해결:** `SeatFacade`를 도입하여 락 획득 성공자만 실제 DB 트랜잭션(SeatService)에 진입하도록 설계.
+
+### [5] Querydsl과 인덱스 튜닝을 통한 조회 성능 극대화
 
 - **N+1 및 데이터 뻥튀기 방지:** 콘서트 디테일 조회 시 `MultipleBagFetchException`을 방지하기 위해 스케줄(Schedule)은 `fetchJoin`으로 가격(Price)은 `default_batch_fetch_size`를 활용한 지연 로딩으로 최적화.
 - **서브쿼리 튜닝:** 카테고리 필터링 조회 시 N:M 테이블 JOIN으로 인한 데이터 중복을 방지하고자 `EXISTS`서브쿼리로 리팩토링.
@@ -67,7 +72,7 @@ docker-compose up -d
 	- **콘서트 목록:** 정렬 최적화를 위해 `(del_yn, created_at)`복합 인덱스 적용
 	- **좌석 맵:** 잦은 업데이트가 발생하는 상태(`status`) 컬럼을 배제하고 단일 컬럼(`concert_schedule_id`)으로 인덱스를 재설계하여 최적화
 
-### [5] 안정적인 API 환경 및 Swagger 고도화
+### [6] 안정적인 API 환경 및 Swagger 고도화
 
 - **Global Exception:** `@RestControllerAdvice`를 활용한 전역 예외 처리 및 공통 응답 규격(ApiResponse/ApiErrorResponse)을 적용하여 혼란을 최소화.
 - **Swagger 문서화:** `@ParameterObject`를 통해 `record`객체 및 페이징 파라미터를 명시적으로 노출, 마스터 데이터(카테고리, 공연장 ID)의 Example 값을 주입하여 API 테스트 편의성을 극대화.
@@ -91,6 +96,12 @@ docker-compose up -d
 - **검증 결과:** 
 	- 로직이 재개된 유저 1이 자신의 락이 만료되었음을 인지하지 못하고 **유저 2가 보유한 신규 락을 삭제**하는 현상을 성공적으로 재현.
     - 이를 통해 Lua 스크립트를 사용하여 확인과 삭제를 원자적으로 처리하는 `Redisson` 도입의 기술적 당위성을 증명.
+
+#### [3] JPA MultipleBagFetchException 결함 재현 테스트
+- **목적:** JPA에서 두 개 이상의 자식 컬렉션(List)을 동시에 `fetchJoin`할 때 발생하는 기술적 제약 사항을 코드로 재현하고, 최적화 전략의 유효성을 검증.
+- **구현 방식:** - Querydsl을 사용하여 콘서트 정보 조회 시, `Schedules`와 `Prices` 두 컬렉션 모두에 의도적으로 `.fetchJoin()`을 적용하여 쿼리 실행.
+- **검증 결과:** 
+	- 하이버네이트가 2개 이상의 Bag을 동시에 가져올 수 없다는 `MultipleBagFetchException`을 정확히 발생시키는 것을 확인.
 
 ## 6. 프로젝트 구조
 

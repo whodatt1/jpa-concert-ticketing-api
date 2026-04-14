@@ -156,7 +156,7 @@ public class SeatServiceConcurrencyTest {
 			그래서 중간 징검다리인 ValueOperations까지 스파이로 만들어서 연결
 		*/
 		
-		// opsForValue()가 반환하는 진짜 객체를 꺼내서 스파이(Spy) 옷을 입힙니다.
+		// opsForValue()가 반환하는 진짜 객체를 꺼내서 스파이로 설정
 		ValueOperations<String, String> valueOpsSpy = Mockito.spy(redisTemplate.opsForValue());
 
 		// redisTemplate에게 opsForValue() 호출시 위의 스파이를 반환해달라고 지시
@@ -175,7 +175,7 @@ public class SeatServiceConcurrencyTest {
 		}).when(valueOpsSpy).get(lockKey);
 
 		// when
-		// 유저 1이 예매 취소(락 해제)를 시도합니다.
+		// 유저 1이 예매 취소(락 해제)를 시도
 		new Thread(() -> {
 			try {
 				seatService.unlockSeat(targetSeatId, user1);
