@@ -7,6 +7,7 @@ import static com.tiketing.api.concert.entity.QVenue.venue;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import org.springframework.data.domain.Pageable;
@@ -77,7 +78,7 @@ public class ConcertRepositoryImpl implements ConcertRepositoryCustom {
 	}
 	
 	@Override
-	public Concert getConcert(Long concertId) {
+	public Optional<Concert> getConcert(Long concertId) {
 		
 		Concert content = queryFactory
 				.selectFrom(concert)
@@ -88,7 +89,7 @@ public class ConcertRepositoryImpl implements ConcertRepositoryCustom {
 				)
 				.fetchOne();
 		
-		return content;
+		return Optional.ofNullable(content);
 	}
 	
 	// =======================================================

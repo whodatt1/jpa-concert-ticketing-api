@@ -132,7 +132,7 @@ public class ConcertService {
 	}
 	
 	public ConcertResponse.Detail getConcert(Long concertId) {
-		Concert concert = concertRepository.findById(concertId)
+		Concert concert = concertRepository.getConcert(concertId)
 				.orElseThrow(() -> new BusinessException(ErrorCode.CONCERT_NOT_FOUND));
 		
 		return ConcertResponse.Detail.from(concert);
