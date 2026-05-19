@@ -22,7 +22,7 @@ public class SeatController {
 	private final SeatService seatService;
 	private final SeatFacade seatFacade;
 	
-	@Operation(summary = "좌석 5분 임시 선점", description = "결제를 위해 5분간 좌석에 락(Lock)을 겁니다.")
+	@Operation(summary = "좌석 선점", description = "결제 전 좌석을 선점합니다.")
 	@PostMapping("/{seatId}/reserve")
 	public ResponseEntity<Void> reserveSeat(
 			@PathVariable("seatId") Long seatId,
@@ -32,7 +32,7 @@ public class SeatController {
 		return ResponseEntity.ok().build();
 	}
 	
-	@Operation(summary = "좌석 선점 취소 (락 해제)", description = "결제를 취소하고 선점한 좌석을 즉시 해제합니다.")
+	@Operation(summary = "좌석 선점 취소", description = "결제를 취소하고 선점한 좌석을 즉시 해제합니다.")
 	@DeleteMapping("/{seatId}/reserve")
 	public ResponseEntity<Void> unlockSeat(
 			@PathVariable("seatId") Long seatId,
